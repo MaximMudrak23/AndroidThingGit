@@ -1,8 +1,11 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
+import { Image, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
-  const animatedValue = useRef(new Animated.Value(0)).current; // Используем useRef
+  const animatedValue = useRef(new Animated.Value(0)).current;
+  const router = useRouter();
 
   useEffect(() => {
     Animated.loop(
@@ -20,16 +23,36 @@ export default function HomeScreen() {
       ])
     ).start();
   }, []);
-
   const bgColor = animatedValue.interpolate({
     inputRange: [0, 0.5, 1],
     outputRange: ['#ff9a9e', '#fad0c4', '#FF8800'],
   });
 
+  const [selectedHero, setSelectedHero] = useState('Invoker');
+
+  const heroImages: { [key: string]: any } = {
+    'Invoker': require('../../assets/images/invoker.png'),
+    'Phantom Assassin': require('../../assets/images/phantom.png'),
+    'Pudge': require('../../assets/images/pudge.png'),
+    'Juggernaut': require('../../assets/images/jugg.png')
+  }
   return (
     <Animated.View style={[styles.container, { backgroundColor: bgColor }]}>
-      <TouchableOpacity style={styles.button} onPress={() => console.log('zxczxc')}>
-        <Text style={styles.text}>zxc</Text>
+      <Image source={heroImages[selectedHero] || null} style={styles.image} />
+      <TouchableOpacity style={styles.button} onPress={() => console.log(selectedHero)}>
+        <Text numberOfLines={1} style={styles.text}>{selectedHero}</Text>
+      </TouchableOpacity>
+      <Picker
+        selectedValue={selectedHero}
+        style={{ height: 80, width: '60%' }}
+        onValueChange={(itemValue) => setSelectedHero(itemValue)}>
+          <Picker.Item label="Invoker" value="Invoker" />
+          <Picker.Item label="Phantom Assassin" value="Phantom Assassin" />
+          <Picker.Item label="Pudge" value="Pudge" />
+          <Picker.Item label="Juggernaut" value="Juggernaut" />
+      </Picker>
+      <TouchableOpacity style={{marginTop: 100}} onPress={() => router.push('/Lab3Screen')}>
+        <Text style={[styles.text]}>Перейти до вводу повідомлення</Text>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -41,17 +64,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
   button: {
     borderRadius: 10,
     borderWidth: 3,
     borderColor: 'black',
-    width: 100,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 10,
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  image: {
+    width: 250,
+    height: 150,
+    marginBottom: 50,
+    borderRadius: 10,
   },
 });
